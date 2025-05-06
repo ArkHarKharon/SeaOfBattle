@@ -5,3 +5,4 @@ public class Main {
         frame.setLocationRelativeTo(null);
     }
 }
+//idk
