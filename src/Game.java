@@ -97,32 +97,63 @@ public class Game {
      * @param j
      */
     public void attack(int mas[][], int i, int j) {
-        hostTurnNumber++;
-        mas[i][j] += 7;
-        isPartKilled(mas, i, j);
-        testEndGame();
-        thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //если промах
-                if (clientShipArray[i][j] < 8) {
-                    PlayerTurn = false;
-                    enemyTurn = true; //передаем ход компьютеру
-                    // Ходит компьютер - пока попадает в цель
-                    while (enemyTurn == true) {
-                        try {
-                            Thread.sleep(pause);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+        if(isHost){
+            hostTurnNumber++;
+            mas[i][j] += 7;
+            isPartKilled(mas, i, j);
+            testEndGame();
+            thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //если промах
+                    if (clientShipArray[i][j] < 8) {
+                        PlayerTurn = false;
+                        enemyTurn = true; //передаем ход компьютеру
+                        // Ходит компьютер - пока попадает в цель
+                        while (enemyTurn == true) {
+                            try {
+                                Thread.sleep(pause);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            //enemyTurn = compHodit(hostShipArray);
+                            //воспроизводим звук при попадании компьютера
                         }
-                        //enemyTurn = compHodit(hostShipArray);
-                        //воспроизводим звук при попадании компьютера
+                        PlayerTurn = true;//передаем ход игроку после промаха компьютера
                     }
-                    PlayerTurn = true;//передаем ход игроку после промаха компьютера
                 }
-            }
-        });
-        thread.start();
+            });
+            thread.start();
+        }
+
+        else{
+            clientTurnNumber++;
+            mas[i][j] += 7;
+            isPartKilled(mas, i, j);
+            testEndGame();
+            thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //если промах
+                    if (hostShipArray[i][j] < 8) {
+                        enemyTurn = false;
+                        PlayerTurn = true; //передаем ход компьютеру
+                        // Ходит компьютер - пока попадает в цель
+                        while (PlayerTurn == true) {
+                            try {
+                                Thread.sleep(pause);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            //enemyTurn = compHodit(hostShipArray);
+                            //воспроизводим звук при попадании компьютера
+                        }
+                        enemyTurn = true;//передаем ход игроку после промаха компьютера
+                    }
+                }
+            });
+            thread.start();
+        }
     }
 
 

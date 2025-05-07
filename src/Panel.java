@@ -105,7 +105,7 @@ public class Panel extends JPanel {
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 //корабли противника
-                if (Game.clientShipArray[i][j]!=0) {
+                if (true){//(Game.clientShipArray[i][j]!=0) {
                     //если игра пк против пк, то показываем палубы комьютера
                     if ((Game.clientShipArray[i][j] >= 1) && (Game.clientShipArray[i][j] <= 4 )) {
                         g.drawImage(paluba, DXY + 13 * H + H * i, DXY + H * j, H, H, null);
@@ -243,23 +243,45 @@ public class Panel extends JPanel {
             if ((e.getButton() == 1) && (e.getClickCount() == 1)) {
                 mX = e.getX();
                 mY = e.getY();
-                if ((placement && p1+p2+p3+p4==0) || !placement
-                        && mX > (DXY + 13 * H) && mY > (DXY) && mX < (DXY + 23 * H) && mY < DXY + 10 * H) {
-                    //если внутри поля бота и если не конец игры и ход игрока
-                    if (game.PlayerTurn && Game.GameState ==0 && !game.enemyTurn){
-                        //то вычисляем элемент массива:
-                       int i=(mX-(DXY+13*H))/H;
-                       int j=(mY-DXY)/H;
-                        if ((i>=0 && i<=9) && (j>=0 && j<=9)) {
-                            System.out.println("Мы нажали на " + i+ " " +j);
-                            if (game.clientShipArray[i][j] <= 4 && game.clientShipArray[i][j] >= -1) {
-                                //-1 это окружение не убитого корабля
-                                game.attack(game.clientShipArray, i, j);
+                if(Game.isHost){
+                    if ((placement && p1 + p2 + p3 + p4 == 0) || !placement
+                            && mX > (DXY + 13 * H) && mY > (DXY) && mX < (DXY + 23 * H) && mY < DXY + 10 * H) {
+                        //если внутри поля противника и если не конец игры и ход игрока
+                        if (game.PlayerTurn && Game.GameState == 0 && !game.enemyTurn) {
+                            //то вычисляем элемент массива:
+                            int i = (mX - (DXY + 13 * H)) / H;
+                            int j = (mY - DXY) / H;
+                            if ((i >= 0 && i <= 9) && (j >= 0 && j <= 9)) {
+                                System.out.println("Хост нажал на " + i + " " + j);
+                                if (game.clientShipArray[i][j] <= 4 && game.clientShipArray[i][j] >= -1) {
+                                    //-1 это окружение не убитого корабля
+                                    game.attack(game.clientShipArray, i, j);
+                                }
                             }
                         }
-                    }
 
+                    }
                 }
+                else{
+                    if ((placement && p1 + p2 + p3 + p4 == 0) || !placement
+                            && mX > (DXY + 13 * H) && mY > (DXY) && mX < (DXY + 23 * H) && mY < DXY + 10 * H) {
+                        //если внутри поля противника и если не конец игры и ход игрока
+                        if (game.enemyTurn && Game.GameState == 0 && !game.PlayerTurn) {
+                            //то вычисляем элемент массива:
+                            int i = (mX - (DXY + 13 * H)) / H;
+                            int j = (mY - DXY) / H;
+                            if ((i >= 0 && i <= 9) && (j >= 0 && j <= 9)) {
+                                System.out.println("Клиент нажал " + i + " " + j);
+                                if (Game.hostShipArray[i][j] <= 4 && Game.hostShipArray[i][j] >= -1) {
+                                    //-1 это окружение не убитого корабля
+                                    game.attack(Game.hostShipArray, i, j);
+                                }
+                            }
+                        }
+
+                    }
+                }
+
             }
             if (placement){
                 if (line4.contains(e.getPoint())){
