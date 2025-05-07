@@ -5,8 +5,8 @@ public class GameClient {
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
-    private ObjectInput obj_in;
-    private ObjectOutput obj_out;
+    private ObjectInputStream obj_in;
+    private ObjectOutputStream obj_out;
 
     public void start(String ip, int port) throws IOException {
         socket = new Socket(ip, port);
@@ -14,6 +14,9 @@ public class GameClient {
 
         out = new PrintWriter(socket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+        obj_in = new ObjectInputStream(socket.getInputStream());
+        obj_out = new ObjectOutputStream(socket.getOutputStream());
     }
 
     public void sendMessage(String msg) {

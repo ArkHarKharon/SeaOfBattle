@@ -5,8 +5,8 @@ public class GameServer {
     private ServerSocket serverSocket;
     private Socket clientSocket;
     private PrintWriter out;
-    private ObjectInput obj_in;
-    private ObjectOutput obj_out;
+    private ObjectInputStream obj_in;
+    private ObjectOutputStream obj_out;
     private BufferedReader in;
 
     public void start(int port) throws IOException {
@@ -17,6 +17,9 @@ public class GameServer {
 
         out = new PrintWriter(clientSocket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+        obj_in = new ObjectInputStream(clientSocket.getInputStream());
+        obj_out = new ObjectOutputStream(clientSocket.getOutputStream());
     }
 
     public void sendMessage(String msg) {
