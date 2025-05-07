@@ -105,24 +105,24 @@ public class Panel extends JPanel {
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 //корабли противника
-                if (game.clientShipArray[i][j]!=0) {
+                if (Game.clientShipArray[i][j]!=0) {
                     //если игра пк против пк, то показываем палубы комьютера
-                    if ((game.clientShipArray[i][j] >= 1) && (game.clientShipArray[i][j] <= 4 )) {
+                    if ((Game.clientShipArray[i][j] >= 1) && (Game.clientShipArray[i][j] <= 4 )) {
                         g.drawImage(paluba, DXY + 13 * H + H * i, DXY + H * j, H, H, null);
                     }
                     //Если это палуба раненного корабля, то выводим соотвествующее изображение
-                    else if ((game.clientShipArray[i][j] >= 8) && (game.clientShipArray[i][j] <= 11)) {
+                    else if ((Game.clientShipArray[i][j] >= 8) && (Game.clientShipArray[i][j] <= 11)) {
                         g.drawImage(ranen, DXY + 13 * H + H * i, DXY + H * j, H, H, null);
                     }
-                    else if ((game.clientShipArray[i][j] >= 15)) {
+                    else if ((Game.clientShipArray[i][j] >= 15)) {
                         //рисуем палубу убитого корабля
                         g.drawImage(killed, DXY + 13 * H + H * i, DXY + H * j, H, H, null);
                     }
-                    else if ((game.clientShipArray[i][j] >= 5 && game.clientShipArray[i][j]<8 || game.clientShipArray[i][j]==-2)) {
+                    else if ((Game.clientShipArray[i][j] >= 5 && Game.clientShipArray[i][j]<8 || Game.clientShipArray[i][j]==-2)) {
                         //если выстрел мимо и это окружение убитого корабля
                         g.drawImage(boom, DXY + 13 * H + H * i, DXY + H * j, H, H, null);
                     }
-                    else if (Game.GameState !=0 && (game.clientShipArray[i][j] >= 1 && game.clientShipArray[i][j] <= 4)) {
+                    else if (Game.GameState !=0 && (Game.clientShipArray[i][j] >= 1 && Game.clientShipArray[i][j] <= 4)) {
                         //показываем корабли после конца игры
                         g.drawImage(paluba, DXY + 13 * H + H * i, DXY + H * j, H, H, null);
                         g.setColor(new Color(0));

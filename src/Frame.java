@@ -18,6 +18,7 @@ public class Frame extends JFrame {
     private JMenuItem hostRole;
     private JMenuItem clientRole;
 
+
     Frame() {
         super("Sea Of Battle");
         Panel pole=new Panel();
@@ -54,8 +55,8 @@ public class Frame extends JFrame {
                     String response = server.receiveMessage();
                     System.out.println("Получено от клиента: " + response);
                     Game.isHost = true;
-                    server.sendArray(Game.hostShipArray);
-                    Game.clientShipArray = server.getArray();
+                    server.sendArray(Game.getHostShip());
+                    Game.setClientShipArray(server.getArray());
 
 
                 } catch (IOException ex) {
@@ -74,8 +75,8 @@ public class Frame extends JFrame {
                     client.sendMessage("хост подключен!");
                     Game.isHost = false;
 
-                    client.sendArray(Game.clientShipArray);
-                    Game.hostShipArray = client.getArray();
+                    client.sendArray(Game.getClientShip());
+                    Game.setHostShipArray(client.getArray());
 
                 } catch (IOException ex) {
                     ex.printStackTrace();

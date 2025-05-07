@@ -6,8 +6,25 @@ import java.lang.reflect.Array;
 
 public class Game {
     public static int hostShipArray[][];
-    public static int clientShipArray[][];
+    public static  int clientShipArray[][];
     public static boolean isHost;
+
+    public static int[][] getHostShip() {
+        return hostShipArray;
+    }
+
+    public static int[][] getClientShip() {
+        return clientShipArray;
+    }
+
+    public static void setHostShipArray(int[][] hostShips) {
+        hostShipArray = hostShips;
+    }
+
+    public static void setClientShipArray(int[][] clientShips) {
+        clientShipArray = clientShips;
+    }
+
     /**
      * Процесс игры
      * 0-игра идет 1-Выиграл игрок 2- Выиграл компьютер
