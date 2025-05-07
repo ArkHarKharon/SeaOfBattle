@@ -193,7 +193,7 @@ public class Panel extends JPanel {
 
         if (Game.GameState ==0 && (p1+p2+p3+p4)==0 && placement || Game.GameState ==0 && !placement){
             g.setFont(new Font("Times New Roman", 0, H - 5));
-            if (game.PlayerTurn) {
+            if (game.hostTurn) {
                 g.setColor(Color.black);
                 g.drawString("Ход игрока", DXY + 24 * H, DXY + 12 * H - (H / 4));
             }
@@ -247,7 +247,7 @@ public class Panel extends JPanel {
                     if ((placement && p1 + p2 + p3 + p4 == 0) || !placement
                             && mX > (DXY + 13 * H) && mY > (DXY) && mX < (DXY + 23 * H) && mY < DXY + 10 * H) {
                         //если внутри поля противника и если не конец игры и ход игрока
-                        if (game.PlayerTurn && Game.GameState == 0 && !game.enemyTurn) {
+                        if (game.hostTurn && Game.GameState == 0 && !game.clientTurn) {
                             //то вычисляем элемент массива:
                             int i = (mX - (DXY + 13 * H)) / H;
                             int j = (mY - DXY) / H;
@@ -266,7 +266,7 @@ public class Panel extends JPanel {
                     if ((placement && p1 + p2 + p3 + p4 == 0) || !placement
                             && mX > (DXY + 13 * H) && mY > (DXY) && mX < (DXY + 23 * H) && mY < DXY + 10 * H) {
                         //если внутри поля противника и если не конец игры и ход игрока
-                        if (game.enemyTurn && Game.GameState == 0 && !game.PlayerTurn) {
+                        if (game.clientTurn && Game.GameState == 0 && !game.hostTurn) {
                             //то вычисляем элемент массива:
                             int i = (mX - (DXY + 13 * H)) / H;
                             int j = (mY - DXY) / H;

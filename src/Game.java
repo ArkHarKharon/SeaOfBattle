@@ -2,7 +2,6 @@
  * импортируем библиотеку для вывода диалогового окна о победе/проигрыше
  */
 import javax.swing.JOptionPane;
-import java.lang.reflect.Array;
 
 public class Game {
     public static int hostShipArray[][];
@@ -48,8 +47,8 @@ public class Game {
     /**
      * Логическая переменная, true - если сейчас ход игрока
      */
-    public boolean PlayerTurn;
-    public boolean enemyTurn;
+    public boolean hostTurn;
+    public boolean clientTurn;
     /**
      * Все атаки компьютера будут происходить в новом потоке
      */
@@ -78,8 +77,8 @@ public class Game {
                 clientShipArray[i][j] = 0;
             }
         }
-        PlayerTurn = true; //мой ход
-        enemyTurn = false;
+        hostTurn = true; //мой ход
+        clientTurn = false;
         GameState = 0;// игра идет
         enemysDeadShips(clientShipArray);
         playersDeadShips(hostShipArray);
@@ -107,10 +106,10 @@ public class Game {
                 public void run() {
                     //если промах
                     if (clientShipArray[i][j] < 8) {
-                        PlayerTurn = false;
-                        enemyTurn = true; //передаем ход компьютеру
+                        hostTurn = false;
+                        clientTurn = true; //передаем ход компьютеру
                         // Ходит компьютер - пока попадает в цель
-                        while (enemyTurn == true) {
+                        while (clientTurn == true) {
                             try {
                                 Thread.sleep(pause);
                             } catch (InterruptedException e) {
@@ -119,7 +118,7 @@ public class Game {
                             //enemyTurn = compHodit(hostShipArray);
                             //воспроизводим звук при попадании компьютера
                         }
-                        PlayerTurn = true;//передаем ход игроку после промаха компьютера
+                        hostTurn = true;//передаем ход игроку после промаха компьютера
                     }
                 }
             });
@@ -136,10 +135,10 @@ public class Game {
                 public void run() {
                     //если промах
                     if (hostShipArray[i][j] < 8) {
-                        enemyTurn = false;
-                        PlayerTurn = true; //передаем ход компьютеру
+                        clientTurn = false;
+                        hostTurn = true; //передаем ход компьютеру
                         // Ходит компьютер - пока попадает в цель
-                        while (PlayerTurn == true) {
+                        while (hostTurn == true) {
                             try {
                                 Thread.sleep(pause);
                             } catch (InterruptedException e) {
@@ -148,7 +147,7 @@ public class Game {
                             //enemyTurn = compHodit(hostShipArray);
                             //воспроизводим звук при попадании компьютера
                         }
-                        enemyTurn = true;//передаем ход игроку после промаха компьютера
+                        clientTurn = true;//передаем ход игроку после промаха компьютера
                     }
                 }
             });
@@ -492,6 +491,20 @@ public class Game {
         }
     }
 
-
+    boolean enemyTurn(int[][] shiArr){
+        if(isHost){
+            if(hostTurn){
+                return true;
+            }
+            else return false;
+        }
+        else if (!isHost) {
+            if(clientTurn){
+                return true;
+            }
+            else return false;
+        }
+        else return false;
+    }
 
 }
