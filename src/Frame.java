@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Frame extends JFrame {
@@ -45,7 +46,6 @@ public class Frame extends JFrame {
 
 
         hostRole.addActionListener(e -> {
-            new Thread(() -> {
                 try {
                     GameServer server = new GameServer();
                     server.start(5555);  // выбранный порт
@@ -56,17 +56,15 @@ public class Frame extends JFrame {
                     Game.isHost = true;
                     int[][] hostArr = {{1,2},{3,4}};
                     server.sendArray(hostArr);
-                    System.out.println(server.getArray());
+                    System.out.println(Arrays.deepToString(server.getArray()));
 
 
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
-            }).start();
         });
 
         clientRole.addActionListener(e -> {
-            new Thread(() -> {
                 try {
                     Scanner scan = new Scanner(System.in);
                     String ip_adress = scan.nextLine();
@@ -78,11 +76,10 @@ public class Frame extends JFrame {
                     Game.isHost = false;
                     int[][] clientArr = {{4,5},{6,7}};
                     client.sendArray(clientArr);
-                    System.out.println(client.getArray());
+                    System.out.println(Arrays.deepToString(client.getArray()));
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
-            }).start();
         });
 
 

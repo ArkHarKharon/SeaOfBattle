@@ -15,11 +15,14 @@ public class GameServer {
         clientSocket = serverSocket.accept();
         System.out.println("Клиент подключён!");
 
+        // Сначала ObjectOutputStream
+        obj_out = new ObjectOutputStream(clientSocket.getOutputStream());
+        obj_out.flush();
+        obj_in = new ObjectInputStream(clientSocket.getInputStream());
+
+        // Затем текстовые потоки
         out = new PrintWriter(clientSocket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-        obj_in = new ObjectInputStream(clientSocket.getInputStream());
-        obj_out = new ObjectOutputStream(clientSocket.getOutputStream());
     }
 
     public void sendMessage(String msg) {
@@ -33,6 +36,8 @@ public class GameServer {
     public void stop() throws IOException {
         in.close();
         out.close();
+        obj_in.close();
+        obj_out.close();
         clientSocket.close();
         serverSocket.close();
     }
@@ -40,17 +45,16 @@ public class GameServer {
     public void sendArray(int[][] array) {
         try {
             obj_out.writeObject(array);
+            obj_out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        catch (IOException e) {}
     }
 
     public int[][] getArray() {
         try {
-            int[][] arr = (int[][]) obj_in.readObject();
-            return arr;
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+            return (int[][]) obj_in.readObject();
+        } catch (ClassNotFoundException | IOException e) {
             throw new RuntimeException(e);
         }
     }
