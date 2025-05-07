@@ -54,9 +54,8 @@ public class Frame extends JFrame {
                     String response = server.receiveMessage();
                     System.out.println("Получено от клиента: " + response);
                     Game.isHost = true;
-                    int[][] hostArr = {{1,2},{3,4}};
-                    server.sendArray(hostArr);
-                    System.out.println(Arrays.deepToString(server.getArray()));
+                    server.sendArray(Game.hostShipArray);
+                    Game.clientShipArray = server.getArray();
 
 
                 } catch (IOException ex) {
@@ -74,9 +73,10 @@ public class Frame extends JFrame {
                     System.out.println("Сообщение от хоста: " + msg);
                     client.sendMessage("хост подключен!");
                     Game.isHost = false;
-                    int[][] clientArr = {{4,5},{6,7}};
-                    client.sendArray(clientArr);
-                    System.out.println(Arrays.deepToString(client.getArray()));
+
+                    client.sendArray(Game.clientShipArray);
+                    Game.hostShipArray = client.getArray();
+
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }

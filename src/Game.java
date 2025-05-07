@@ -5,8 +5,8 @@ import javax.swing.JOptionPane;
 import java.lang.reflect.Array;
 
 public class Game {
-    public int hostShipArray[][];
-    public int clientShipArray[][];
+    public static int hostShipArray[][];
+    public static int clientShipArray[][];
     public static boolean isHost;
     /**
      * Процесс игры

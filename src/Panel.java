@@ -84,11 +84,11 @@ public class Panel extends JPanel {
 
         }
         //Выведение надписей
-        g.drawString("Игрок", DXY + 4 * H, DXY - H);
-        g.drawString("Компьютер", DXY + 16 * H, DXY - H);
-        g.drawString("Ходов игрока: ", DXY + 24 * H, DXY + 13 * H - (H/4));
+        g.drawString("Хост", DXY + 4 * H, DXY - H);
+        g.drawString("Клиент", DXY + 16 * H, DXY - H);
+        g.drawString("Ходов хоста: ", DXY + 24 * H, DXY + 13 * H - (H/4));
         g.drawString(String.valueOf(game.hostTurnNumber), DXY + 29 * H, DXY + 13 * H - (H / 4));
-        g.drawString("Ходов комьютера: ", DXY + 24 * H, DXY + 14 * H - (H/4));
+        g.drawString("Ходов клиента: ", DXY + 24 * H, DXY + 14 * H - (H/4));
         g.drawString(String.valueOf(game.clientTurnNumber), DXY + 30 * H + (H / 2), DXY + 14 * H - (H / 4));
 
         //Выводим цифры и буквы
