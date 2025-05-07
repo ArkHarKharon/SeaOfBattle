@@ -5,6 +5,8 @@ public class GameServer {
     private ServerSocket serverSocket;
     private Socket clientSocket;
     private PrintWriter out;
+    private ObjectInput obj_in;
+    private ObjectOutput obj_out;
     private BufferedReader in;
 
     public void start(int port) throws IOException {
@@ -30,5 +32,23 @@ public class GameServer {
         out.close();
         clientSocket.close();
         serverSocket.close();
+    }
+
+    public void sendArray(int[][] array) {
+        try {
+            obj_out.writeObject(array);
+        }
+        catch (IOException e) {}
+    }
+
+    public int[][] getArray() {
+        try {
+            int[][] arr = (int[][]) obj_in.readObject();
+            return arr;
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

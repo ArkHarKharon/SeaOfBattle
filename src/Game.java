@@ -2,30 +2,32 @@
  * импортируем библиотеку для вывода диалогового окна о победе/проигрыше
  */
 import javax.swing.JOptionPane;
+import java.lang.reflect.Array;
 
 public class Game {
-    public int playerShipArray[][];
-    public int enemyShipArray[][];
+    public int hostShipArray[][];
+    public int clientShipArray[][];
+    public static boolean isHost;
     /**
      * Процесс игры
      * 0-игра идет 1-Выиграл игрок 2- Выиграл компьютер
      */
-    public static int GameState =3;
+    public static int GameState = 3;
     /**
      * Показывает количество кораблей игрока
      */
-    public int P1,P2,P3,P4;
+    public int P1, P2, P3, P4;
     /**
      * Показывает количество кораблей компьютера
      */
-    public int C1,C2,C3,C4;
-    public int playerTurnNumber;
-    public int enemyTurnNumber;
+    public int C1, C2, C3, C4;
+    public int hostTurnNumber;
+    public int clientTurnNumber;
 
     /**
      * Время паузы при выстреле компьютера в милисекндуах
      */
-    public final int pause=500;
+    public final int pause = 500;
     /**
      * Логическая переменная, true - если сейчас ход игрока
      */
@@ -34,55 +36,59 @@ public class Game {
     /**
      * Все атаки компьютера будут происходить в новом потоке
      */
-    Thread thread=new Thread();
+    Thread thread = new Thread();
+
     /**
      * Конструктор класса, в котором происходит инициализация
      * двумерных массивов игрока и компьютера
      */
     Game() {
-        playerShipArray = new int[10][10];
-        enemyShipArray = new int[10][10];
+        hostShipArray = new int[10][10];
+        clientShipArray = new int[10][10];
     }
+
     /**
      * Запуск игры
      * Происходит обнуление массивов и расстановка кораблей
      */
     public void start() {
-        enemyTurnNumber =0;
-        playerTurnNumber =0;
+        clientTurnNumber = 0;
+        hostTurnNumber = 0;
         //обнуляем массив
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                playerShipArray[i][j] = 0;
-                enemyShipArray[i][j] = 0;
+                hostShipArray[i][j] = 0;
+                clientShipArray[i][j] = 0;
             }
         }
-        PlayerTurn =true; //мой ход
-        enemyTurn =false;
-        GameState =0;// игра идет
-        enemysDeadShips(enemyShipArray);
-        playersDeadShips(playerShipArray);
-        if (Panel.placement ==false) {
+        PlayerTurn = true; //мой ход
+        enemyTurn = false;
+        GameState = 0;// игра идет
+        enemysDeadShips(clientShipArray);
+        playersDeadShips(hostShipArray);
+        if (Panel.placement == false) {
             playerAutoPlacement();
         }
-        setPalubaComp();
+
     }
+
     /**
      * Атака игрока
+     *
      * @param mas
      * @param i
      * @param j
      */
-    public void attack(int mas[][],int i,int j) {
-        playerTurnNumber++;
+    public void attack(int mas[][], int i, int j) {
+        hostTurnNumber++;
         mas[i][j] += 7;
         isPartKilled(mas, i, j);
         testEndGame();
-        thread =new Thread(new Runnable() {
+        thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 //если промах
-                if (enemyShipArray[i][j] < 8) {
+                if (clientShipArray[i][j] < 8) {
                     PlayerTurn = false;
                     enemyTurn = true; //передаем ход компьютеру
                     // Ходит компьютер - пока попадает в цель
@@ -92,7 +98,7 @@ public class Game {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        enemyTurn = compHodit(playerShipArray);
+                        //enemyTurn = compHodit(hostShipArray);
                         //воспроизводим звук при попадании компьютера
                     }
                     PlayerTurn = true;//передаем ход игроку после промаха компьютера
@@ -101,10 +107,7 @@ public class Game {
         });
         thread.start();
     }
-    /**
-     * Автоигра компьютера
-     * Запускаем в новом потоке
-     */
+
 
 
     /**
@@ -112,60 +115,72 @@ public class Game {
      * Сумма массива, когда все корабли убиты, равна 15*4+16*2*3+17*3*2+18*4 = 330
      * Суммируем элементы массива, и если сумма равна 330, то заканчиваем игру
      */
-    public void testEndGame(){
-        if (GameState ==0){
-        int endScore=330; //когда все корабли убиты
-        int playerScore=0; // Сумма убитых палуб игрока
-        int enemyScore=0; // Сумма убитых палуб компьютера
-        enemysDeadShips(enemyShipArray);
-        playersDeadShips(playerShipArray);
-            if (GameState ==0) {
+    public void testEndGame() {
+        if (GameState == 0) {
+            int endScore = 330; //когда все корабли убиты
+            int playerScore = 0; // Сумма убитых палуб игрока
+            int enemyScore = 0; // Сумма убитых палуб компьютера
+            enemysDeadShips(clientShipArray);
+            playersDeadShips(hostShipArray);
+            if (GameState == 0) {
                 for (int i = 0; i < 10; i++) {
                     for (int j = 0; j < 10; j++) {
-                    // Суммируем подбитые палубы
-                    if (playerShipArray[i][j] >= 15) playerScore += playerShipArray[i][j];
-                    if (enemyShipArray[i][j] >= 15) enemyScore += enemyShipArray[i][j];
+                        // Суммируем подбитые палубы
+                        if (hostShipArray[i][j] >= 15) playerScore += hostShipArray[i][j];
+                        if (clientShipArray[i][j] >= 15) enemyScore += clientShipArray[i][j];
+                    }
+                }
+                if (playerScore == endScore) {
+                    GameState = 2;
+                    //выводим диалоговое окно игроку
+                    JOptionPane.showMessageDialog(null,
+                            "Вы проиграли! Попробуйте еще раз",
+                            "Вы проиграли", JOptionPane.INFORMATION_MESSAGE);
+
+                } else if (enemyScore == endScore) {
+                    GameState = 1;
+                    //выводим диалоговое окно игроку
+                    JOptionPane.showMessageDialog(null,
+                            "Поздравляю! Вы выиграли!",
+                            "Вы выиграли", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
-            if (playerScore == endScore) {
-                GameState = 2;
-                //выводим диалоговое окно игроку
-                JOptionPane.showMessageDialog(null,
-                        "Вы проиграли! Попробуйте еще раз",
-                        "Вы проиграли", JOptionPane.INFORMATION_MESSAGE);
-
-            } else if (enemyScore == endScore) {
-                GameState = 1;
-                //выводим диалоговое окно игроку
-                JOptionPane.showMessageDialog(null,
-                        "Поздравляю! Вы выиграли!",
-                        "Вы выиграли", JOptionPane.INFORMATION_MESSAGE);
-            }
-            }
         }
     }
+
     /**
      * Подсчитываем количество убитых кораблей компьютера
+     *
      * @param mas
      */
-    public void enemysDeadShips(int[][]mas){
-        P4=0;P3=0;P2=0;P1=0;
+    public void enemysDeadShips(int[][] mas) {
+        P4 = 0;
+        P3 = 0;
+        P2 = 0;
+        P1 = 0;
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                if (mas[i][j]==18) P4 = (P4 + 1);
-                if (mas[i][j]==17) P3 = (P3 + 1);
-                if (mas[i][j]==16) P2 = (P2 + 1);
-                if (mas[i][j]==15) P1 = (P1 + 1);
+                if (mas[i][j] == 18) P4 = (P4 + 1);
+                if (mas[i][j] == 17) P3 = (P3 + 1);
+                if (mas[i][j] == 16) P2 = (P2 + 1);
+                if (mas[i][j] == 15) P1 = (P1 + 1);
             }
         }
-        P4/=4;P3/=3;P2/=2;
+        P4 /= 4;
+        P3 /= 3;
+        P2 /= 2;
     }
+
     /**
      * Считаем убитые корабли игрока
+     *
      * @param mas
      */
-    public void playersDeadShips(int[][]mas) {
-        C4 = 0;C3 = 0;C2 = 0;C1 = 0;
+    public void playersDeadShips(int[][] mas) {
+        C4 = 0;
+        C3 = 0;
+        C2 = 0;
+        C1 = 0;
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 if (mas[i][j] == 18) C4 = (C4 + 1);
@@ -174,56 +189,59 @@ public class Game {
                 if (mas[i][j] == 15) C1 = (C1 + 1);
             }
         }
-        C4/=4;C3/=3;C2/=2;
+        C4 /= 4;
+        C3 /= 3;
+        C2 /= 2;
     }
+
     /**
      * Метод проверяет убита ли палуба
      * Данный метод вызывает метод analizUbit() для разных видов кораблей.
+     *
      * @param mas массив для теста
      * @param i
      * @param j
      */
-    private void isPartKilled(int mas[][], int i, int j){
-        if (mas[i][j]==8) { //Если однопалубный
+    private void isPartKilled(int mas[][], int i, int j) {
+        if (mas[i][j] == 8) { //Если однопалубный
             mas[i][j] += 7; //прибавляем к убитому +7
-            setKilledShipSpaceDecr(mas,i,j);//Уменьшаем окружение убитого на 1
-        }
-        else if (mas[i][j]==9){
-            isShipKilled(mas,i,j,2);
-        }
-        else if (mas[i][j]==10){
-            isShipKilled(mas,i,j,3);
-        }
-        else if (mas[i][j]==11){
-            isShipKilled(mas,i,j,4);
+            setKilledShipSpaceDecr(mas, i, j);//Уменьшаем окружение убитого на 1
+        } else if (mas[i][j] == 9) {
+            isShipKilled(mas, i, j, 2);
+        } else if (mas[i][j] == 10) {
+            isShipKilled(mas, i, j, 3);
+        } else if (mas[i][j] == 11) {
+            isShipKilled(mas, i, j, 4);
         }
     }
+
     /**
      * Анализ, убит ли корабль
-     * @param mas двумерный массив
+     *
+     * @param mas         двумерный массив
      * @param i
      * @param j
      * @param partsNumber количество палуб
      */
     private void isShipKilled(int[][] mas, int i, int j, int partsNumber) {
         //Количество раненых палуб
-        int partsKilledNumber =0;
+        int partsKilledNumber = 0;
         //Выполняем подсчет раненых палуб
-        for (int x=i-(partsNumber-1);x<=i+(partsNumber-1);x++) {
-            for (int y=j-(partsNumber-1);y<=j+(partsNumber-1);y++) {
+        for (int x = i - (partsNumber - 1); x <= i + (partsNumber - 1); x++) {
+            for (int y = j - (partsNumber - 1); y <= j + (partsNumber - 1); y++) {
                 // Если это палуба раненого корабля
-                if (testArrayOut(x, y)&&(mas[x][y]==partsNumber+7)) partsKilledNumber++;
+                if (testArrayOut(x, y) && (mas[x][y] == partsNumber + 7)) partsKilledNumber++;
             }
         }
         // Если количество раненых палуб совпадает с количеством палуб
         // корабля, то он убит - прибавляем число 7
-        if (partsKilledNumber==partsNumber) {
-            for (int x=i-(partsNumber-1);x<=i+(partsNumber-1);x++) {
-                for (int y=j-(partsNumber-1);y<=j+(partsNumber-1);y++) {
-                // Если это палуба раненого корабля
-                    if (testArrayOut(x, y)&&(mas[x][y]==partsNumber+7)) {
+        if (partsKilledNumber == partsNumber) {
+            for (int x = i - (partsNumber - 1); x <= i + (partsNumber - 1); x++) {
+                for (int y = j - (partsNumber - 1); y <= j + (partsNumber - 1); y++) {
+                    // Если это палуба раненого корабля
+                    if (testArrayOut(x, y) && (mas[x][y] == partsNumber + 7)) {
                         // помечаем палубой убитого корабля
-                        mas[x][y]+=7;
+                        mas[x][y] += 7;
                         // уменьшаем на 1 окружение убитого корабля
                         setKilledShipSpaceDecr(mas, x, y);
                     }
@@ -233,22 +251,24 @@ public class Game {
     }
 
 
-
     /**
      * Метод уменьшает на 1 значение массива, если значения равны -1 или 6
+     *
      * @param mas двумерный массив
      * @param i
      * @param j
      */
-    public void setOkrKilled(int mas[][],int i,int j){
-        if (testArrayOut(i, j)){
-            if (mas[i][j]==-1 || mas[i][j]==6){
+    public void setOkrKilled(int mas[][], int i, int j) {
+        if (testArrayOut(i, j)) {
+            if (mas[i][j] == -1 || mas[i][j] == 6) {
                 mas[i][j]--;
             }
         }
     }
+
     /**
      * Сам метод, который уменьшает на 1 окружение всего убитого корабля
+     *
      * @param mas двумерный массив
      * @param i
      * @param j
@@ -263,130 +283,10 @@ public class Game {
         setOkrKilled(mas, i + 1, j - 1); // снизу слева
         setOkrKilled(mas, i, j - 1); // слева
     }
-    /**
-     * Выстрел комьютера
-     * @return true, если попал, иначе false
-     */
-    boolean compHodit(int mas[][]) {
-        //если идет автоигра или ход компьютера
-        if ((GameState == 0) || (enemyTurn)) {
-            // Признак попадания в цель
-            boolean popal = false;
-            // Признак выстрела в раненый корабль
-            boolean ranen = false;
-            //признак направления корабля
-            boolean horiz = false;
-            _for1:
-            // break метка
-            // Пробегаем все игровое поле игрока
-            for (int i = 0; i < 10; i++)
-                for (int j = 0; j < 10; j++)
-                    //если находим раненую палубу
-                    if ((mas[i][j] >= 9) && (mas[i][j] <= 11)) {
-                        ranen = true;
-                        //ищем подбитую палубу слева и справа
-                        if ((testArrayOut(i - 3, j) && mas[i - 3][j] >= 9 && (mas[i - 3][j] <= 11))
-                                || (testArrayOut(i - 2, j) && mas[i - 2][j] >= 9 && (mas[i - 2][j] <= 11))
-                                || (testArrayOut(i - 1, j) && mas[i - 1][j] >= 9 && (mas[i - 1][j] <= 11))
-                                || (testArrayOut(i + 3, j) && mas[i + 3][j] >= 9 && (mas[i + 3][j] <= 11))
-                                || (testArrayOut(i + 2, j) && mas[i + 2][j] >= 9 && (mas[i + 2][j] <= 11))
-                                || (testArrayOut(i + 1, j) && mas[i + 1][j] >= 9 && (mas[i + 1][j] <= 11))) {
-                            horiz = true;
-                        } else if ((testArrayOut(i, j + 3) && mas[i][j + 3] >= 9 && (mas[i][j + 3] <= 11))
-                                //ищем подбитую палубу сверху и снизу
-                                || (testArrayOut(i, j + 2) && mas[i][j + 2] >= 9 && (mas[i][j + 2] <= 11))
-                                || (testArrayOut(i, j + 1) && mas[i][j + 1] >= 9 && (mas[i][j + 1] <= 11))
-                                || (testArrayOut(i, j - 3) && mas[i][j - 3] >= 9 && (mas[i][j - 3] <= 11))
-                                || (testArrayOut(i, j - 2) && mas[i][j - 2] >= 9 && (mas[i][j - 2] <= 11))
-                                || (testArrayOut(i, j - 1) && mas[i][j - 1] >= 9 && (mas[i][j - 1] <= 11))) {
-                            horiz = false;
-                        }
-                        //если не удалось определить направление корабля, то выбираем произвольное направление для обстрела
-                        else for (int x = 0; x < 50; x++) {
-                            int napr = (int) (Math.random() * 4);
-                            if (napr == 0 && testArrayOut(i - 1, j) && (mas[i - 1][j] <= 4) && (mas[i - 1][j] != -2)) {
-                                mas[i - 1][j] += 7;
-                                //проверяем, убили или нет
-                                isPartKilled(mas, i - 1, j);
-                                if (mas[i - 1][j] >= 8) popal = true;
-                                //прерываем цикл
-                                break _for1;
-                            } else if (napr == 1 && testArrayOut(i + 1, j) && (mas[i + 1][j] <= 4) && (mas[i + 1][j] != -2)) {
-                                mas[i + 1][j] += 7;
-                                isPartKilled(mas, i + 1, j);
-                                if (mas[i + 1][j] >= 8) popal = true;
-                                break _for1;
-                            } else if (napr == 2 && testArrayOut(i, j - 1) && (mas[i][j - 1] <= 4) && (mas[i][j - 1] != -2)) {
-                                mas[i][j - 1] += 7;
-                                isPartKilled(mas, i, j - 1);
-                                if (mas[i][j - 1] >= 8) popal = true;
-                                break _for1;
-                            } else if (napr == 3 && testArrayOut(i, j + 1) && (mas[i][j + 1] <= 4) && (mas[i][j + 1] != -2)) {
-                                mas[i][j + 1] += 7;
-                                isPartKilled(mas, i, j + 1);
-                                if (mas[i][j + 1] >= 8) popal = true;
-                                break _for1;
-                            }
-                        }
-                        //если определили направление, то производим выстрел только в этом напрвлении
-                        if (horiz) { //по горизонтали
-                            if (testArrayOut(i - 1, j) && (mas[i - 1][j] <= 4) && (mas[i - 1][j] != -2)) {
-                                mas[i - 1][j] += 7;
-                                isPartKilled(mas, i - 1, j);
-                                if (mas[i - 1][j] >= 8) popal = true;
-                                break _for1;
-                            } else if (testArrayOut(i + 1, j) && (mas[i + 1][j] <= 4) && (mas[i + 1][j] != -2)) {
-                                mas[i + 1][j] += 7;
-                                isPartKilled(mas, i + 1, j);
-                                if (mas[i + 1][j] >= 8) popal = true;
-                                break _for1;
-                            }
-                        }//по вертикали
-                        else if (testArrayOut(i, j - 1) && (mas[i][j - 1] <= 4) && (mas[i][j - 1] != -2)) {
-                            mas[i][j - 1] += 7;
-                            isPartKilled(mas, i, j - 1);
-                            if (mas[i][j - 1] >= 8) popal = true;
-                            break _for1;
-                        } else if (testArrayOut(i, j + 1) && (mas[i][j + 1] <= 4) && (mas[i][j + 1] != -2)) {
-                            mas[i][j + 1] += 7;
-                            isPartKilled(mas, i, j + 1);
-                            if (mas[i][j + 1] >= 8) popal = true;
-                            break _for1;
-                        }
-                    }
 
-            // если нет ранненых кораблей
-            if (ranen == false) {
-                // делаем 100 случайных попыток выстрела
-                // в случайное место
-                for (int l = 1; l <= 100; l++) {
-                    // Находим случайную позицию на игровом поле
-                    int i = (int) (Math.random() * 10);
-                    int j = (int) (Math.random() * 10);
-                    //Проверяем, что можно сделать выстрел
-                    if ((mas[i][j] <= 4) && (mas[i][j] != -2)) {
-                        //делаем выстрел
-                        mas[i][j] += 7;
-                        //проверяем, что убит
-                        isPartKilled(mas, i, j);
-                        // если произошло попадание
-                        if (mas[i][j] >= 8)
-                            popal = true;
-                        //выстрел произошел
-                        ranen = true;
-                        //прерываем цикл
-                        break;
-                    }
-                }
-            }
-            // проверяем конец игры
-            testEndGame();
-            // возвращаем результат
-            return popal;
-        }else return false;
-    }
     /**
      * проверка выхода за пределы массива
+     *
      * @param i строка
      * @param j столбец
      * @return если выхода за пределы массива нет, то true
@@ -400,6 +300,7 @@ public class Game {
     /**
      * Вспомогательный метод для устаноки окружения корабля
      * Контролирует выход за пределы массива
+     *
      * @param mas двумерный массив
      * @param i
      * @param j
@@ -414,6 +315,7 @@ public class Game {
     /**
      * перебирает все ячейки вокруг и устанавливает в них нужное значение.
      * Если происходит выход за границы массива – эта ситуация контролируется в методе setOkr().
+     *
      * @param mas двумерный массив
      * @param i
      * @param j
@@ -431,25 +333,26 @@ public class Game {
     }
 
 
-
     /**
      * Этот метод выполняет проверку выхода за границы массива и значение в ячейке,
      * в которой мы хотим разместить новую палубу.
      * Если это значения 0 или -2, то мы можем разместить там новую палубу.
+     *
      * @param mas
      * @param i
      * @param j
      * @return
      */
-    private boolean testNewPartPlacement(int [][]mas, int i, int j){
-        if (testArrayOut(i, j)==false) return false;
-        if ((mas[i][j]==0) || (mas[i][j]==-2)) return true;
+    private boolean testNewPartPlacement(int[][] mas, int i, int j) {
+        if (testArrayOut(i, j) == false) return false;
+        if ((mas[i][j] == 0) || (mas[i][j] == -2)) return true;
         else return false;
     }
 
     /**
      * Пробегаемся по всему массиву
      * Если значение элемента массива -2, то заменяем его на -1
+     *
      * @param mas
      */
     private void okrEnd(int[][] mas) {
@@ -465,9 +368,10 @@ public class Game {
     /**
      * Генерация палуб
      * Выбираем случайное направление построения корабля. 0 - вверх, 1 - вправо, 2 - вниз, 3 - влево
+     *
      * @param mas двумерный массив
      */
-    private void partAutoPlacement(int [][]mas, int kolPal){
+    private void partAutoPlacement(int[][] mas, int kolPal) {
         int i = 0, j = 0;
         while (true) {
             boolean flag = false;
@@ -478,19 +382,16 @@ public class Game {
             // Если можно расположить палубу
             if (testNewPartPlacement(mas, i, j) == true) {
                 if (napr == 0) { //вверх
-                    if (testNewPartPlacement(mas, i -(kolPal - 1), j) == true)  //если можно расположить палубу вверх, то flag = true
+                    if (testNewPartPlacement(mas, i - (kolPal - 1), j) == true)  //если можно расположить палубу вверх, то flag = true
                         flag = true;
-                }
-                else if (napr == 1){ // вправо
+                } else if (napr == 1) { // вправо
                     if (testNewPartPlacement(mas, i, j + (kolPal - 1)) == true)
                         flag = true;
-                }
-                else if (napr == 2){ // вниз
+                } else if (napr == 2) { // вниз
                     if (testNewPartPlacement(mas, i + (kolPal - 1), j) == true)
                         flag = true;
-                }
-                else if (napr == 3){ // влево
-                    if (testNewPartPlacement(mas, i, j -(kolPal - 1)) == true)
+                } else if (napr == 3) { // влево
+                    if (testNewPartPlacement(mas, i, j - (kolPal - 1)) == true)
                         flag = true;
                 }
             }
@@ -501,25 +402,22 @@ public class Game {
                 okrBegin(mas, i, j, -2);
                 if (napr == 0) {// вверх
                     for (int k = kolPal - 1; k >= 1; k--) {
-                        mas[i -k][j] = kolPal;
+                        mas[i - k][j] = kolPal;
                         okrBegin(mas, i - k, j, -2);
                     }
-                }
-                else if (napr == 1){ // вправо
+                } else if (napr == 1) { // вправо
                     for (int k = kolPal - 1; k >= 1; k--) {
                         mas[i][j + k] = kolPal;
                         okrBegin(mas, i, j + k, -2);
                     }
-                }
-                else if (napr == 2){ // вниз
-                 for (int k = kolPal - 1; k >= 1; k--) {
-                     mas[i + k][j] = kolPal;
-                     okrBegin(mas, i + k, j, -2);
-                    }
-                }
-                else if (napr == 3){ // влево
+                } else if (napr == 2) { // вниз
                     for (int k = kolPal - 1; k >= 1; k--) {
-                        mas[i][j -k] = kolPal;
+                        mas[i + k][j] = kolPal;
+                        okrBegin(mas, i + k, j, -2);
+                    }
+                } else if (napr == 3) { // влево
+                    for (int k = kolPal - 1; k >= 1; k--) {
+                        mas[i][j - k] = kolPal;
                         okrBegin(mas, i, j - k, -2);
                     }
                 }
@@ -533,31 +431,19 @@ public class Game {
     /**
      * Метод для расстаноки всех кораблей для игрока
      */
-    private void playerAutoPlacement(){
-        partAutoPlacement(playerShipArray, 4);
+    private void playerAutoPlacement() {
+        partAutoPlacement(hostShipArray, 4);
         for (int i = 1; i <= 2; i++) {
-            partAutoPlacement(playerShipArray, 3);
+            partAutoPlacement(hostShipArray, 3);
         }
         for (int i = 1; i <= 3; i++) {
-            partAutoPlacement(playerShipArray, 2);
+            partAutoPlacement(hostShipArray, 2);
         }
-        for (int i = 1;i<= 4;i++){
-            partAutoPlacement(playerShipArray,1);
-        }
-    }
-    /**
-     * Метод для расстаноки всех кораблей для компьютера
-     */
-    private void setPalubaComp(){
-        partAutoPlacement(enemyShipArray, 4);
-        for (int i = 1; i <= 2; i++) {
-            partAutoPlacement(enemyShipArray, 3);
-        }
-        for (int i = 1; i <= 3; i++) {
-            partAutoPlacement(enemyShipArray, 2);
-        }
-        for (int i = 1;i<= 4;i++){
-            partAutoPlacement(enemyShipArray,1);
+        for (int i = 1; i <= 4; i++) {
+            partAutoPlacement(hostShipArray, 1);
         }
     }
+
+
+
 }
