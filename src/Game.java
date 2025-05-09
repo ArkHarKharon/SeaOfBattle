@@ -131,6 +131,33 @@ public class Game {
      * @param i
      * @param j
      */
+    public boolean processEnemyAttack(){
+        if(!isHost && hostTurn){
+            int[] enemyShot = new int[2];
+            enemyShot = client.getShot();
+            int i = enemyShot[0];
+            int j = enemyShot[1];
+            clientTurnNumber++;
+            playerShipArray[i][j] +=7;
+            testEndGame();
+            if(playerShipArray[i][j] >= 8){
+                return true;
+            }
+        }
+        else if(isHost && clientTurn){
+            int[] enemyShot = new int[2];
+            enemyShot = server.getShot();
+            int i = enemyShot[0];
+            int j = enemyShot[1];
+            hostTurnNumber++;
+            playerShipArray[i][j] +=7;
+            testEndGame();
+            if(playerShipArray[i][j] >= 8){
+                return true;
+            }
+        }
+    }
+
     public void attack(int mas[][], int i, int j) {
         if(isHost){
             hostTurnNumber++;
@@ -151,7 +178,7 @@ public class Game {
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            //enemyTurn = compHodit(hostShipArray);
+                            clientTurn = processEnemyAttack();
                             //воспроизводим звук при попадании компьютера
                         }
                         hostTurn = true;//передаем ход игроку после промаха компьютера
@@ -180,7 +207,7 @@ public class Game {
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            //enemyTurn = compHodit(hostShipArray);
+                            hostTurn = processEnemyAttack();
                             //воспроизводим звук при попадании компьютера
                         }
                         clientTurn = true;//передаем ход игроку после промаха компьютера

@@ -58,4 +58,21 @@ public class GameServer {
             throw new RuntimeException(e);
         }
     }
+
+    public void sendShot(int[] array) {
+        try {
+            obj_out.writeObject(array);
+            obj_out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int[] getShot() {
+        try {
+            return (int[]) obj_in.readObject();
+        } catch (ClassNotFoundException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
