@@ -107,6 +107,7 @@ public class Game {
                 enemyShipArray[i][j] = 0;
             }
         }
+
         hostTurn = isHost; //мой ход
         clientTurn = !isHost;
         GameState = 0;// игра идет
@@ -122,21 +123,32 @@ public class Game {
             client.sendArray(playerShipArray);
             enemyShipArray = client.getArray();
         }
+        if(!isHost){
+            while(true){
+                try{
+                    if(!processEnemyAttack()){
+                        hostTurn = false;
+                        clientTurn = true;
+                        break;
+                    }
+
+                } catch (Exception e) {
+
+                }
+            }
+        }
     }
 
-    /**
-     * Атака игрока
-     *
-     * @param mas
-     * @param i
-     * @param j
-     */
+
     public boolean processEnemyAttack(){
-        if(!isHost && hostTurn){
+        System.out.println("Начинаю обрабатывать атаку!");
+        if(!isHost && clientTurn){
+            System.out.println("Обработка атаки хоста!");
             int[] enemyShot = new int[2];
             enemyShot = client.getShot();
             int i = enemyShot[0];
             int j = enemyShot[1];
+            System.out.println(Arrays.toString(enemyShot));
             clientTurnNumber++;
             playerShipArray[i][j] +=7;
             testEndGame();
@@ -149,6 +161,7 @@ public class Game {
             enemyShot = server.getShot();
             int i = enemyShot[0];
             int j = enemyShot[1];
+
             hostTurnNumber++;
             playerShipArray[i][j] +=7;
             testEndGame();
@@ -156,11 +169,16 @@ public class Game {
                 return true;
             }
         }
+        return false;
     }
 
     public void attack(int mas[][], int i, int j) {
         if(isHost){
             hostTurnNumber++;
+            int[] shot = new int[2];
+            shot[0] = i;
+            shot[1] = j;
+            server.sendShot(shot);
             mas[i][j] += 7;
             isPartKilled(mas, i, j);
             testEndGame();
@@ -190,6 +208,10 @@ public class Game {
 
         else{
             clientTurnNumber++;
+            int[] shot = new int[2];
+            shot[0] = i;
+            shot[1] = j;
+            client.sendShot(shot);
             mas[i][j] += 7;
             isPartKilled(mas, i, j);
             testEndGame();
