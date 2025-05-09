@@ -10,7 +10,6 @@ import java.util.Scanner;
 public class Frame extends JFrame {
 
     private JMenuBar menuBar;
-    private JMenu menuGame;
     private JMenu menuGameStart;
     private JMenuItem itemStartAuto;
     private JMenuItem itemExit;
@@ -23,7 +22,6 @@ public class Frame extends JFrame {
         super("Sea Of Battle");
         Panel pole=new Panel();
         menuBar=new JMenuBar();
-        menuGame = new JMenu("Игра");
         networkMenu = new JMenu("Сеть");
         hostRole= new JMenuItem("Стать хостом");
         clientRole = new JMenuItem("Подключиться");
@@ -55,7 +53,7 @@ public class Frame extends JFrame {
                     String response = server.receiveMessage();
                     System.out.println("Получено от клиента: " + response);
                     Game.isHost = true;
-
+                    pole.start();
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -71,6 +69,7 @@ public class Frame extends JFrame {
                     System.out.println("Сообщение от хоста: " + msg);
                     client.sendMessage("хост подключен!");
                     Game.isHost = false;
+                    pole.start();
 
                 } catch (IOException ex) {
                     ex.printStackTrace();
@@ -79,9 +78,6 @@ public class Frame extends JFrame {
 
 
         menuGameStart.add(itemStartAuto);
-        menuGame.add(menuGameStart);
-        menuGame.add(itemExit);
-        menuBar.add(menuGame);
         menuBar.add(networkMenu);
         networkMenu.add(hostRole);
         networkMenu.add(clientRole);
