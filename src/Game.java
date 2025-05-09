@@ -2,13 +2,16 @@
  * импортируем библиотеку для вывода диалогового окна о победе/проигрыше
  */
 import javax.swing.JOptionPane;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Scanner;
 
 public class Game {
     public static int playerShipArray[][];
     public static  int enemyShipArray[][];
-    GameServer server = new GameServer();
-    GameClient client = new GameClient();
-    public static boolean isHost;
+    public static GameClient client = new GameClient();
+    public static GameServer server = new GameServer();
+    public static boolean isHost = false;
 
     public static int[][] getPlayerShip() {
         return playerShipArray;
@@ -26,6 +29,30 @@ public class Game {
         enemyShipArray = clientShips;
     }
 
+    public void initNetwork( String ip_adress){
+        if(isHost){
+            try {
+                server.start(5555);  // выбранный порт
+                // Пример: отправка сообщения
+                server.sendMessage("клиент подключен!");
+                String response = server.receiveMessage();
+                System.out.println("Получено от клиента: " + response);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        else{
+            try {
+                client.start(ip_adress, 5555);  // IP сервера
+                String msg = client.receiveMessage();
+                System.out.println("Сообщение от хоста: " + msg);
+                client.sendMessage("хост подключен!");
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
     /**
      * Процесс игры
      * 0-игра идет 1-Выиграл игрок 2- Выиграл компьютер
@@ -70,6 +97,7 @@ public class Game {
      * Происходит обнуление массивов и расстановка кораблей
      */
     public void start() {
+        initNetwork("192.168.0.109");
         clientTurnNumber = 0;
         hostTurnNumber = 0;
         //обнуляем массив
@@ -79,19 +107,18 @@ public class Game {
                 enemyShipArray[i][j] = 0;
             }
         }
-        hostTurn = true; //мой ход
-        clientTurn = false;
+        hostTurn = isHost; //мой ход
+        clientTurn = !isHost;
         GameState = 0;// игра идет
         enemysDeadShips(enemyShipArray);
         playersDeadShips(playerShipArray);
-        if (Panel.placement == false) {
-            playerAutoPlacement();
-        }
+        playerAutoPlacement();
+        System.out.println(Arrays.deepToString(playerShipArray));
         if(isHost){
             server.sendArray(playerShipArray);
             enemyShipArray = server.getArray();
         }
-        else if(clientTurn){
+        else{
             client.sendArray(playerShipArray);
             enemyShipArray = client.getArray();
         }
@@ -487,7 +514,7 @@ public class Game {
     /**
      * Метод для расстаноки всех кораблей для игрока
      */
-    private void playerAutoPlacement() {
+    public void playerAutoPlacement() {
         partAutoPlacement(playerShipArray, 4);
         for (int i = 1; i <= 2; i++) {
             partAutoPlacement(playerShipArray, 3);

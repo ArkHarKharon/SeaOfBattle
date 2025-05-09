@@ -45,35 +45,13 @@ public class Frame extends JFrame {
 
 
         hostRole.addActionListener(e -> {
-                try {
-                    GameServer server = new GameServer();
-                    server.start(5555);  // выбранный порт
-                    // Пример: отправка сообщения
-                    server.sendMessage("клиент подключен!");
-                    String response = server.receiveMessage();
-                    System.out.println("Получено от клиента: " + response);
-                    Game.isHost = true;
-                    pole.start();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+            Game.isHost = true;
+            pole.start();
         });
 
         clientRole.addActionListener(e -> {
-                try {
-                    Scanner scan = new Scanner(System.in);
-                    String ip_adress = scan.nextLine();
-                    GameClient client = new GameClient();
-                    client.start(ip_adress, 5555);  // IP сервера
-                    String msg = client.receiveMessage();
-                    System.out.println("Сообщение от хоста: " + msg);
-                    client.sendMessage("хост подключен!");
-                    Game.isHost = false;
-                    pole.start();
-
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+            Game.isHost = false;
+            pole.start();
         });
 
 
