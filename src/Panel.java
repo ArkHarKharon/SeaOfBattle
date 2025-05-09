@@ -107,22 +107,22 @@ public class Panel extends JPanel {
                 //корабли противника
                 if (true){//(Game.clientShipArray[i][j]!=0) {
                     //если игра пк против пк, то показываем палубы комьютера
-                    if ((Game.clientShipArray[i][j] >= 1) && (Game.clientShipArray[i][j] <= 4 )) {
+                    if ((Game.enemyShipArray[i][j] >= 1) && (Game.enemyShipArray[i][j] <= 4 )) {
                         g.drawImage(paluba, DXY + 13 * H + H * i, DXY + H * j, H, H, null);
                     }
                     //Если это палуба раненного корабля, то выводим соотвествующее изображение
-                    else if ((Game.clientShipArray[i][j] >= 8) && (Game.clientShipArray[i][j] <= 11)) {
+                    else if ((Game.enemyShipArray[i][j] >= 8) && (Game.enemyShipArray[i][j] <= 11)) {
                         g.drawImage(ranen, DXY + 13 * H + H * i, DXY + H * j, H, H, null);
                     }
-                    else if ((Game.clientShipArray[i][j] >= 15)) {
+                    else if ((Game.enemyShipArray[i][j] >= 15)) {
                         //рисуем палубу убитого корабля
                         g.drawImage(killed, DXY + 13 * H + H * i, DXY + H * j, H, H, null);
                     }
-                    else if ((Game.clientShipArray[i][j] >= 5 && Game.clientShipArray[i][j]<8 || Game.clientShipArray[i][j]==-2)) {
+                    else if ((Game.enemyShipArray[i][j] >= 5 && Game.enemyShipArray[i][j]<8 || Game.enemyShipArray[i][j]==-2)) {
                         //если выстрел мимо и это окружение убитого корабля
                         g.drawImage(boom, DXY + 13 * H + H * i, DXY + H * j, H, H, null);
                     }
-                    else if (Game.GameState !=0 && (Game.clientShipArray[i][j] >= 1 && Game.clientShipArray[i][j] <= 4)) {
+                    else if (Game.GameState !=0 && (Game.enemyShipArray[i][j] >= 1 && Game.enemyShipArray[i][j] <= 4)) {
                         //показываем корабли после конца игры
                         g.drawImage(paluba, DXY + 13 * H + H * i, DXY + H * j, H, H, null);
                         g.setColor(new Color(0));
@@ -131,20 +131,20 @@ public class Panel extends JPanel {
                 }
 
                 //корабли игрока
-                if (game.hostShipArray[i][j]!=0){
-                    if ((game.hostShipArray[i][j] >= 1) && (game.hostShipArray[i][j] <= 4)) {
+                if (game.playerShipArray[i][j]!=0){
+                    if ((game.playerShipArray[i][j] >= 1) && (game.playerShipArray[i][j] <= 4)) {
                         //палуба
                         g.drawImage(paluba, DXY + H * i, DXY + H * j, H, H, null);
-                    }else if ((game.hostShipArray[i][j] >= 8) && (game.hostShipArray[i][j] <= 11)) {
+                    }else if ((game.playerShipArray[i][j] >= 8) && (game.playerShipArray[i][j] <= 11)) {
                         //ранен
                         g.drawImage(ranen, DXY + + H * i, DXY + H * j, H, H, null);
-                    }else if ((game.hostShipArray[i][j] >= 15)) {
+                    }else if ((game.playerShipArray[i][j] >= 15)) {
                         //убит
                         g.drawImage(killed, DXY + H * i, DXY + H * j, H, H, null);
-                    }else if ((game.hostShipArray[i][j] >= 5) && game.hostShipArray[i][j]<8) {
+                    }else if ((game.playerShipArray[i][j] >= 5) && game.playerShipArray[i][j]<8) {
                         //мимо
                         g.drawImage(boom, DXY +  + H * i, DXY + H * j, H, H, null);
-                    }else if (game.hostShipArray[i][j] ==-2){
+                    }else if (game.playerShipArray[i][j] ==-2){
                         //окружения убитого в автоигре
                         g.drawImage(boom, DXY +  + H * i, DXY + H * j, H, H, null);
                     }
@@ -253,9 +253,9 @@ public class Panel extends JPanel {
                             int j = (mY - DXY) / H;
                             if ((i >= 0 && i <= 9) && (j >= 0 && j <= 9)) {
                                 System.out.println("Хост нажал на " + i + " " + j);
-                                if (game.clientShipArray[i][j] <= 4 && game.clientShipArray[i][j] >= -1) {
+                                if (game.enemyShipArray[i][j] <= 4 && game.enemyShipArray[i][j] >= -1) {
                                     //-1 это окружение не убитого корабля
-                                    game.attack(game.clientShipArray, i, j);
+                                    game.attack(game.enemyShipArray, i, j);
                                 }
                             }
                         }
@@ -272,9 +272,9 @@ public class Panel extends JPanel {
                             int j = (mY - DXY) / H;
                             if ((i >= 0 && i <= 9) && (j >= 0 && j <= 9)) {
                                 System.out.println("Клиент нажал " + i + " " + j);
-                                if (Game.hostShipArray[i][j] <= 4 && Game.hostShipArray[i][j] >= -1) {
+                                if (Game.playerShipArray[i][j] <= 4 && Game.playerShipArray[i][j] >= -1) {
                                     //-1 это окружение не убитого корабля
-                                    game.attack(Game.hostShipArray, i, j);
+                                    game.attack(Game.playerShipArray, i, j);
                                 }
                             }
                         }

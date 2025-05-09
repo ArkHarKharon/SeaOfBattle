@@ -4,24 +4,24 @@
 import javax.swing.JOptionPane;
 
 public class Game {
-    public static int hostShipArray[][];
-    public static  int clientShipArray[][];
+    public static int playerShipArray[][];
+    public static  int enemyShipArray[][];
     public static boolean isHost;
 
-    public static int[][] getHostShip() {
-        return hostShipArray;
+    public static int[][] getPlayerShip() {
+        return playerShipArray;
     }
 
-    public static int[][] getClientShip() {
-        return clientShipArray;
+    public static int[][] getEnemyShip() {
+        return enemyShipArray;
     }
 
-    public static void setHostShipArray(int[][] hostShips) {
-        hostShipArray = hostShips;
+    public static void setPlayerShipArray(int[][] hostShips) {
+        playerShipArray = hostShips;
     }
 
-    public static void setClientShipArray(int[][] clientShips) {
-        clientShipArray = clientShips;
+    public static void setEnemyShipArray(int[][] clientShips) {
+        enemyShipArray = clientShips;
     }
 
     /**
@@ -59,8 +59,8 @@ public class Game {
      * двумерных массивов игрока и компьютера
      */
     Game() {
-        hostShipArray = new int[10][10];
-        clientShipArray = new int[10][10];
+        playerShipArray = new int[10][10];
+        enemyShipArray = new int[10][10];
     }
 
     /**
@@ -73,15 +73,15 @@ public class Game {
         //обнуляем массив
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                hostShipArray[i][j] = 0;
-                clientShipArray[i][j] = 0;
+                playerShipArray[i][j] = 0;
+                enemyShipArray[i][j] = 0;
             }
         }
         hostTurn = true; //мой ход
         clientTurn = false;
         GameState = 0;// игра идет
-        enemysDeadShips(clientShipArray);
-        playersDeadShips(hostShipArray);
+        enemysDeadShips(enemyShipArray);
+        playersDeadShips(playerShipArray);
         if (Panel.placement == false) {
             playerAutoPlacement();
         }
@@ -105,7 +105,7 @@ public class Game {
                 @Override
                 public void run() {
                     //если промах
-                    if (clientShipArray[i][j] < 8) {
+                    if (enemyShipArray[i][j] < 8) {
                         hostTurn = false;
                         clientTurn = true; //передаем ход компьютеру
                         // Ходит компьютер - пока попадает в цель
@@ -134,7 +134,7 @@ public class Game {
                 @Override
                 public void run() {
                     //если промах
-                    if (hostShipArray[i][j] < 8) {
+                    if (playerShipArray[i][j] < 8) {
                         clientTurn = false;
                         hostTurn = true; //передаем ход компьютеру
                         // Ходит компьютер - пока попадает в цель
@@ -167,14 +167,14 @@ public class Game {
             int endScore = 330; //когда все корабли убиты
             int playerScore = 0; // Сумма убитых палуб игрока
             int enemyScore = 0; // Сумма убитых палуб компьютера
-            enemysDeadShips(clientShipArray);
-            playersDeadShips(hostShipArray);
+            enemysDeadShips(enemyShipArray);
+            playersDeadShips(playerShipArray);
             if (GameState == 0) {
                 for (int i = 0; i < 10; i++) {
                     for (int j = 0; j < 10; j++) {
                         // Суммируем подбитые палубы
-                        if (hostShipArray[i][j] >= 15) playerScore += hostShipArray[i][j];
-                        if (clientShipArray[i][j] >= 15) enemyScore += clientShipArray[i][j];
+                        if (playerShipArray[i][j] >= 15) playerScore += playerShipArray[i][j];
+                        if (enemyShipArray[i][j] >= 15) enemyScore += enemyShipArray[i][j];
                     }
                 }
                 if (playerScore == endScore) {
@@ -479,15 +479,15 @@ public class Game {
      * Метод для расстаноки всех кораблей для игрока
      */
     private void playerAutoPlacement() {
-        partAutoPlacement(hostShipArray, 4);
+        partAutoPlacement(playerShipArray, 4);
         for (int i = 1; i <= 2; i++) {
-            partAutoPlacement(hostShipArray, 3);
+            partAutoPlacement(playerShipArray, 3);
         }
         for (int i = 1; i <= 3; i++) {
-            partAutoPlacement(hostShipArray, 2);
+            partAutoPlacement(playerShipArray, 2);
         }
         for (int i = 1; i <= 4; i++) {
-            partAutoPlacement(hostShipArray, 1);
+            partAutoPlacement(playerShipArray, 1);
         }
     }
 
