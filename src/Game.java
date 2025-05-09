@@ -6,6 +6,8 @@ import javax.swing.JOptionPane;
 public class Game {
     public static int playerShipArray[][];
     public static  int enemyShipArray[][];
+    GameServer server = new GameServer();
+    GameClient client = new GameClient();
     public static boolean isHost;
 
     public static int[][] getPlayerShip() {
@@ -85,7 +87,14 @@ public class Game {
         if (Panel.placement == false) {
             playerAutoPlacement();
         }
-
+        if(isHost){
+            server.sendArray(playerShipArray);
+            enemyShipArray = server.getArray();
+        }
+        else if(clientTurn){
+            client.sendArray(playerShipArray);
+            enemyShipArray = client.getArray();
+        }
     }
 
     /**
