@@ -4,7 +4,6 @@
 import javax.swing.JOptionPane;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Scanner;
 
 public class Game {
     public static int playerShipArray[][];
@@ -76,8 +75,8 @@ public class Game {
     /**
      * Логическая переменная, true - если сейчас ход игрока
      */
-    public boolean hostTurn;
-    public boolean clientTurn;
+    public boolean playerTurn;
+    public boolean enemyTurn;
     /**
      * Все атаки компьютера будут происходить в новом потоке
      */
@@ -107,8 +106,9 @@ public class Game {
                 enemyShipArray[i][j] = 0;
             }
         }
-        hostTurn = isHost; //мой ход
-        clientTurn = !isHost;
+
+        playerTurn = isHost; //мой ход
+        enemyTurn = !isHost;
         GameState = 0;// игра идет
         enemysDeadShips(enemyShipArray);
         playersDeadShips(playerShipArray);
@@ -122,12 +122,26 @@ public class Game {
             client.sendArray(playerShipArray);
             enemyShipArray = client.getArray();
         }
+        if(!isHost){
+            while(true){
+                try{
+                    if(!processEnemyAttack()){
+                        playerTurn = true;
+                        enemyTurn = false;
+                        break;
+                    }
+
+                } catch (Exception e) {
+
+                }
+            }
+        }
     }
 
 
     public boolean processEnemyAttack(){
         System.out.println("Начинаю обрабатывать атаку!");
-        if(!isHost && hostTurn){
+        if(!isHost && enemyTurn){
             System.out.println("Обработка атаки хоста!");
             int[] enemyShot = new int[2];
             enemyShot = client.getShot();
@@ -136,12 +150,13 @@ public class Game {
             System.out.println(Arrays.toString(enemyShot));
             clientTurnNumber++;
             playerShipArray[i][j] +=7;
+            isPartKilled(playerShipArray,i,j);
             testEndGame();
             if(playerShipArray[i][j] >= 8){
                 return true;
             }
         }
-        else if(isHost && clientTurn){
+        else if(isHost && enemyTurn){
             int[] enemyShot = new int[2];
             enemyShot = server.getShot();
             int i = enemyShot[0];
@@ -149,6 +164,7 @@ public class Game {
 
             hostTurnNumber++;
             playerShipArray[i][j] +=7;
+            isPartKilled(playerShipArray,i,j);
             testEndGame();
             if(playerShipArray[i][j] >= 8){
                 return true;
@@ -172,19 +188,19 @@ public class Game {
                 public void run() {
                     //если промах
                     if (enemyShipArray[i][j] < 8) {
-                        hostTurn = false;
-                        clientTurn = true; //передаем ход компьютеру
+                        playerTurn = false;
+                        enemyTurn = true; //передаем ход компьютеру
                         // Ходит компьютер - пока попадает в цель
-                        while (clientTurn == true) {
+                        while (enemyTurn == true) {
                             try {
                                 Thread.sleep(pause);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            clientTurn = processEnemyAttack();
+                            enemyTurn = processEnemyAttack();
                             //воспроизводим звук при попадании компьютера
                         }
-                        hostTurn = true;//передаем ход игроку после промаха компьютера
+                        playerTurn = true;//передаем ход игроку после промаха компьютера
                     }
                 }
             });
@@ -204,27 +220,26 @@ public class Game {
                 @Override
                 public void run() {
                     //если промах
-                    if (enemyShipArray[i][j] < 8) {
-                        clientTurn = false;
-                        hostTurn = true; //передаем ход компьютеру
+                    if (playerShipArray[i][j] < 8) {
+                        enemyTurn = false;
+                        playerTurn = true; //передаем ход компьютеру
                         // Ходит компьютер - пока попадает в цель
-                        while (hostTurn == true) {
+                        while (playerTurn == true) {
                             try {
                                 Thread.sleep(pause);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            hostTurn = processEnemyAttack();
+                            playerTurn = processEnemyAttack();
                             //воспроизводим звук при попадании компьютера
                         }
-                        clientTurn = true;//передаем ход игроку после промаха компьютера
+                        enemyTurn = true;//передаем ход игроку после промаха компьютера
                     }
                 }
             });
             thread.start();
         }
     }
-
 
 
 
@@ -564,13 +579,13 @@ public class Game {
 
     boolean enemyTurn(int[][] shiArr){
         if(isHost){
-            if(hostTurn){
+            if(playerTurn){
                 return true;
             }
             else return false;
         }
         else if (!isHost) {
-            if(clientTurn){
+            if(enemyTurn){
                 return true;
             }
             else return false;
