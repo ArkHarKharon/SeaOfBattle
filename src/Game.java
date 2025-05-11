@@ -162,7 +162,7 @@ public class Game {
             int i = enemyShot[0];
             int j = enemyShot[1];
 
-            hostTurnNumber++;
+            clientTurnNumber++;
             playerShipArray[i][j] +=7;
             isPartKilled(playerShipArray,i,j);
             testEndGame();
@@ -208,7 +208,7 @@ public class Game {
         }
 
         else{
-            clientTurnNumber++;
+            hostTurnNumber++;
             int[] shot = new int[2];
             shot[0] = i;
             shot[1] = j;
@@ -220,20 +220,20 @@ public class Game {
                 @Override
                 public void run() {
                     //если промах
-                    if (playerShipArray[i][j] < 8) {
-                        enemyTurn = false;
-                        playerTurn = true; //передаем ход компьютеру
+                    if (enemyShipArray[i][j] < 8) {
+                        playerTurn = false;
+                        enemyTurn = true; //передаем ход компьютеру
                         // Ходит компьютер - пока попадает в цель
-                        while (playerTurn == true) {
+                        while (enemyTurn == true) {
                             try {
                                 Thread.sleep(pause);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            playerTurn = processEnemyAttack();
+                            enemyTurn = processEnemyAttack();
                             //воспроизводим звук при попадании компьютера
                         }
-                        enemyTurn = true;//передаем ход игроку после промаха компьютера
+                        playerTurn = true;//передаем ход игроку после промаха компьютера
                     }
                 }
             });

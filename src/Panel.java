@@ -84,11 +84,11 @@ public class Panel extends JPanel {
 
         }
         //Выведение надписей
-        g.drawString("Хост", DXY + 4 * H, DXY - H);
-        g.drawString("Клиент", DXY + 16 * H, DXY - H);
-        g.drawString("Ходов хоста: ", DXY + 24 * H, DXY + 13 * H - (H/4));
+        g.drawString("Игрок", DXY + 4 * H, DXY - H);
+        g.drawString("Противник", DXY + 16 * H, DXY - H);
+        g.drawString("Ходов игрока: ", DXY + 24 * H, DXY + 13 * H - (H/4));
         g.drawString(String.valueOf(game.hostTurnNumber), DXY + 29 * H, DXY + 13 * H - (H / 4));
-        g.drawString("Ходов клиента: ", DXY + 24 * H, DXY + 14 * H - (H/4));
+        g.drawString("Ходов противника: ", DXY + 24 * H, DXY + 14 * H - (H/4));
         g.drawString(String.valueOf(game.clientTurnNumber), DXY + 30 * H + (H / 2), DXY + 14 * H - (H / 4));
 
         //Выводим цифры и буквы
@@ -199,7 +199,7 @@ public class Panel extends JPanel {
             }
             else {
                 g.setColor(Color.black);
-                g.drawString("Ходит компьютер", DXY + 24 * H, DXY + 12 * H - (H / 4));
+                g.drawString("Ход противника", DXY + 24 * H, DXY + 12 * H - (H / 4));
             }
         }if (Game.GameState == 1) {
             timer.stop();
@@ -266,15 +266,15 @@ public class Panel extends JPanel {
                     if ((placement && p1 + p2 + p3 + p4 == 0) || !placement
                             && mX > (DXY + 13 * H) && mY > (DXY) && mX < (DXY + 23 * H) && mY < DXY + 10 * H) {
                         //если внутри поля противника и если не конец игры и ход игрока
-                        if (game.enemyTurn && Game.GameState == 0 && !game.playerTurn) {
+                        if (game.playerTurn && Game.GameState == 0 && !game.enemyTurn) {
                             //то вычисляем элемент массива:
                             int i = (mX - (DXY + 13 * H)) / H;
                             int j = (mY - DXY) / H;
                             if ((i >= 0 && i <= 9) && (j >= 0 && j <= 9)) {
                                 System.out.println("Клиент нажал " + i + " " + j);
-                                if (Game.playerShipArray[i][j] <= 4 && Game.playerShipArray[i][j] >= -1) {
+                                if (Game.enemyShipArray[i][j] <= 4 && Game.enemyShipArray[i][j] >= -1) {
                                     //-1 это окружение не убитого корабля
-                                    game.attack(Game.playerShipArray, i, j);
+                                    game.attack(Game.enemyShipArray, i, j);
                                 }
                             }
                         }
