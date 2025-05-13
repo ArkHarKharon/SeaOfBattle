@@ -31,7 +31,11 @@ public class Frame extends JFrame {
         itemStartAuto.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                pole.start();
+                try {
+                    pole.start();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
 
@@ -47,12 +51,20 @@ public class Frame extends JFrame {
 
         hostRole.addActionListener(e -> {
             Game.isHost = true;
-            pole.start();
+            try {
+                pole.start();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         });
 
         clientRole.addActionListener(e -> {
             Game.isHost = false;
-            pole.start();
+            try {
+                pole.start();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         });
 
 

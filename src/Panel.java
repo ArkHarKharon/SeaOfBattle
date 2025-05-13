@@ -109,8 +109,8 @@ public class Panel extends JPanel {
             for (int j = 0; j < 10; j++) {
                 //корабли противника
                 if (Game.enemyShipArray[i][j]!=0) {
-                    //если игра пк против пк, то показываем палубы комьютера
-                    if(false){//if ((Game.enemyShipArray[i][j] >= 1) && (Game.enemyShipArray[i][j] <= 4 )) {
+                    //Дебаг режим
+                    if(true){
                         g.drawImage(paluba, DXY + 13 * H + H * i, DXY + H * j, H, H, null);
                     }
                     //Если это палуба раненного корабля, то выводим соотвествующее изображение
@@ -212,13 +212,13 @@ public class Panel extends JPanel {
         }
     }
 
-    public void start() {
+    public void start() throws IOException {
         placement = false;
         timer.start();
         game.start();
     }
 
-    public void startPlacement(){
+    public void startPlacement() throws IOException {
         placement = true;
         timer.start();
         game.start();

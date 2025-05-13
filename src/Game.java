@@ -3,6 +3,7 @@
  */
 import javax.swing.JOptionPane;
 import java.io.IOException;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,6 +18,9 @@ public class Game {
     public static boolean isHost = false;
     public static String playerName = new String();
     public static String enemyName = new String();
+    String urlString = "jdbc:sqlserver://localhost:1433;databaseName=SeaOfBattle;" +
+            "user=Ark;encrypt=false;trustServerCertificate=true;";
+
 
     public static int[][] getPlayerShip() {
         return playerShipArray;
@@ -35,8 +39,6 @@ public class Game {
     }
 
     public void initNetwork( String ip_adress){
-        String urlString = "jdbc:sqlserver://localhost:1433;databaseName=SeaOfBattle;" +
-                "user=Ark;encrypt=false;trustServerCertificate=true;";
         if(isHost){
             try {
                 server.start(5555);  // выбранный порт
@@ -46,6 +48,12 @@ public class Game {
                 System.out.println("Получено от клиента: " + response);
             } catch (IOException ex) {
                 ex.printStackTrace();
+            }
+            try (Connection connection = DriverManager.getConnection(urlString)) {
+                System.out.println("Успешное подключение к MS SQL Server");
+            } catch (SQLException e) {
+                System.out.println("Ошибка подключения к MS SQL Server");
+                e.printStackTrace();
             }
         }
         else{
@@ -59,17 +67,22 @@ public class Game {
                 ex.printStackTrace();
             }
         }
+
+    }
+
+    public void sendToDB(String player, String enemy, int pScore, int eScore){
         try (Connection connection = DriverManager.getConnection(urlString)) {
-            System.out.println("Успешное подключение к MS SQL Server");
+            Statement statement = connection.createStatement();
+            String sql = "INSERT INTO Main VALUES ('"+ player +"', " + pScore + ", "+ eScore +
+                    ", '" + enemy + "', GETDATE())";
+
+
         } catch (SQLException e) {
             System.out.println("Ошибка подключения к MS SQL Server");
             e.printStackTrace();
         }
     }
-    /**
-     * Процесс игры
-     * 0-игра идет 1-Выиграл игрок 2- Выиграл компьютер
-     */
+
     public static int GameState = 3;
     /**
      * Показывает количество кораблей игрока
@@ -127,7 +140,6 @@ public class Game {
         enemysDeadShips(enemyShipArray);
         playersDeadShips(playerShipArray);
         playerAutoPlacement();
-        System.out.println(Arrays.deepToString(playerShipArray));
         if(isHost){
             server.sendArray(playerShipArray);
             enemyShipArray = server.getArray();
@@ -283,6 +295,7 @@ public class Game {
                 }
 
                 if (playerScore == endScore) {
+                    sendToDB(playerName,enemyName, playerScore, enemyScore);
                     GameState = 2;
                     System.out.println("Пытаюсь вывести окно поражения");
                     //выводим диалоговое окно игроку

@@ -3,8 +3,6 @@ import java.net.*;
 
 public class GameClient {
     private Socket socket;
-    private PrintWriter out;
-    private BufferedReader in;
     private ObjectInputStream obj_in;
     private ObjectOutputStream obj_out;
 
@@ -14,34 +12,40 @@ public class GameClient {
 
         // Сначала ObjectOutputStream
         obj_out = new ObjectOutputStream(socket.getOutputStream());
-        obj_out.flush(); // обязательно
+        obj_out.flush();
+
+        // Затем ObjectInputStream
         obj_in = new ObjectInputStream(socket.getInputStream());
-
-        // Затем текстовые потоки (если они нужны)
-        out = new PrintWriter(socket.getOutputStream(), true);
-        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-    }
-
-    public void sendMessage(String msg) {
-        out.println(msg);
-    }
-
-    public String receiveMessage() throws IOException {
-        return in.readLine();
     }
 
     public void stop() throws IOException {
-        in.close();
-        out.close();
         obj_in.close();
         obj_out.close();
         socket.close();
     }
 
+    public void sendMessage(String msg) {
+        try {
+            obj_out.writeObject(msg);
+            obj_out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String receiveMessage() {
+        try {
+            return (String) obj_in.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public void sendArray(int[][] array) {
         try {
             obj_out.writeObject(array);
-            obj_out.flush(); // желательно
+            obj_out.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -58,7 +62,7 @@ public class GameClient {
     public void sendShot(int[] array) {
         try {
             obj_out.writeObject(array);
-            obj_out.flush(); // желательно
+            obj_out.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
