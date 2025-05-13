@@ -4,6 +4,10 @@
 import javax.swing.JOptionPane;
 import java.io.IOException;
 import java.util.Arrays;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 
 public class Game {
     public static int playerShipArray[][];
@@ -11,6 +15,8 @@ public class Game {
     public static GameClient client = new GameClient();
     public static GameServer server = new GameServer();
     public static boolean isHost = false;
+    public static String playerName = new String();
+    public static String enemyName = new String();
 
     public static int[][] getPlayerShip() {
         return playerShipArray;
@@ -29,6 +35,8 @@ public class Game {
     }
 
     public void initNetwork( String ip_adress){
+        String urlString = "jdbc:sqlserver://localhost:1433;databaseName=SeaOfBattle;" +
+                "user=Ark;encrypt=false;trustServerCertificate=true;";
         if(isHost){
             try {
                 server.start(5555);  // выбранный порт
@@ -50,6 +58,12 @@ public class Game {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
+        }
+        try (Connection connection = DriverManager.getConnection(urlString)) {
+            System.out.println("Успешное подключение к MS SQL Server");
+        } catch (SQLException e) {
+            System.out.println("Ошибка подключения к MS SQL Server");
+            e.printStackTrace();
         }
     }
     /**
@@ -95,7 +109,7 @@ public class Game {
      * Запуск игры
      * Происходит обнуление массивов и расстановка кораблей
      */
-    public void start() {
+    public void start() throws IOException {
         initNetwork("192.168.0.109");
         clientTurnNumber = 0;
         hostTurnNumber = 0;
@@ -117,13 +131,17 @@ public class Game {
         if(isHost){
             server.sendArray(playerShipArray);
             enemyShipArray = server.getArray();
+            server.sendMessage(playerName);
+            enemyName = server.receiveMessage();
         }
         else{
             client.sendArray(playerShipArray);
             enemyShipArray = client.getArray();
+            client.sendMessage(playerName);
+            enemyName = client.receiveMessage();
         }
         if(!isHost){
-            while(true){
+            while(enemyTurn){
                 try{
                     if(!processEnemyAttack()){
                         playerTurn = true;
@@ -263,14 +281,17 @@ public class Game {
                         if (enemyShipArray[i][j] >= 15) enemyScore += enemyShipArray[i][j];
                     }
                 }
+
                 if (playerScore == endScore) {
                     GameState = 2;
+                    System.out.println("Пытаюсь вывести окно поражения");
                     //выводим диалоговое окно игроку
                     JOptionPane.showMessageDialog(null,
                             "Вы проиграли! Попробуйте еще раз",
                             "Вы проиграли", JOptionPane.INFORMATION_MESSAGE);
 
-                } else if (enemyScore == endScore) {
+                }
+                if (enemyScore == endScore) {
                     GameState = 1;
                     //выводим диалоговое окно игроку
                     JOptionPane.showMessageDialog(null,

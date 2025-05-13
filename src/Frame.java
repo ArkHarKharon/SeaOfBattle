@@ -27,6 +27,7 @@ public class Frame extends JFrame {
         clientRole = new JMenuItem("Подключиться");
         menuGameStart = new JMenu("Новая игра");
         itemStartAuto =new JMenuItem("Расставить корабли");
+        Game.playerName = JOptionPane.showInputDialog(null, "Введите ваше имя:", "Ввод имени", JOptionPane.QUESTION_MESSAGE);
         itemStartAuto.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

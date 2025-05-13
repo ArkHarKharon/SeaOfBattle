@@ -83,9 +83,12 @@ public class Panel extends JPanel {
             if (p1 != 0) ((Graphics2D) g).draw(line1);
 
         }
+
+
+
         //Выведение надписей
-        g.drawString("Игрок", DXY + 4 * H, DXY - H);
-        g.drawString("Противник", DXY + 16 * H, DXY - H);
+        g.drawString(Game.playerName, DXY + 4 * H, DXY - H);
+        g.drawString(Game.enemyName, DXY + 16 * H, DXY - H);
         g.drawString("Ходов игрока: ", DXY + 24 * H, DXY + 13 * H - (H/4));
         g.drawString(String.valueOf(game.hostTurnNumber), DXY + 29 * H, DXY + 13 * H - (H / 4));
         g.drawString("Ходов противника: ", DXY + 24 * H, DXY + 14 * H - (H/4));
@@ -107,7 +110,7 @@ public class Panel extends JPanel {
                 //корабли противника
                 if (Game.enemyShipArray[i][j]!=0) {
                     //если игра пк против пк, то показываем палубы комьютера
-                    if ((Game.enemyShipArray[i][j] >= 1) && (Game.enemyShipArray[i][j] <= 4 )) {
+                    if(false){//if ((Game.enemyShipArray[i][j] >= 1) && (Game.enemyShipArray[i][j] <= 4 )) {
                         g.drawImage(paluba, DXY + 13 * H + H * i, DXY + H * j, H, H, null);
                     }
                     //Если это палуба раненного корабля, то выводим соотвествующее изображение
